@@ -1,0 +1,9 @@
+/target
+/.idea
+/customize
+/db
+/logs
+/downloads
+/drivers
+/*.iml
+/ArticleCrawler.vmoptions
