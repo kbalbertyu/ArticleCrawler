@@ -26,7 +26,7 @@ public class DBManager {
 
     @Inject
     public void initDataSource() {
-        Ioc ioc = new NutIoc(new JsonLoader("conf/jdbc.js"));
+        Ioc ioc = new NutIoc(new JsonLoader("conf/jdbc.json"));
         DataSource ds = ioc.get(DataSource.class);
         dao = new NutDao(ds);
 
