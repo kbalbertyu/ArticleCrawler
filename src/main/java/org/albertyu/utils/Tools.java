@@ -35,7 +35,7 @@ public class Tools {
             }
         }
 
-        if (ArrayUtils.isEmpty(dirs)) {
+        if (dirs == null || ArrayUtils.isEmpty(dirs)) {
             return -1;
         }
         List<Integer> versions = new ArrayList<>(dirs.length);
