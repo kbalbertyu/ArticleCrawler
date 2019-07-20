@@ -8,6 +8,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,5 +57,17 @@ public class Tools {
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(source);
         return matcher.matches();
+    }
+
+    public static void sleep(long timeInSecond) {
+        sleep(timeInSecond, TimeUnit.SECONDS);
+    }
+
+    private static void sleep(long time, TimeUnit timeunit) {
+        try {
+            timeunit.sleep(time);
+        } catch (InterruptedException e) {
+            // -> Ignore
+        }
     }
 }
