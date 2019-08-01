@@ -1,10 +1,16 @@
 package org.albertyu.utils;
 
+import com.alibaba.fastjson.JSONObject;
+import org.albertyu.model.Constant;
+import org.albertyu.model.config.Config;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.nutz.lang.Lang;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -69,5 +75,18 @@ public class Tools {
         } catch (InterruptedException e) {
             // -> Ignore
         }
+    }
+
+    private static String readFileToString(File file) {
+        try {
+            return FileUtils.readFileToString(file, "UTF-8");
+        } catch (IOException e) {
+            throw Lang.wrapThrow(e);
+        }
+    }
+
+    public static Config loadAppConfig() {
+        String configStr = Tools.readFileToString(FileUtils.getFile(Constant.CONFIG, "app.json"));
+        return JSONObject.parseObject(configStr, Config.class);
     }
 }
