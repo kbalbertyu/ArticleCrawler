@@ -2,7 +2,10 @@ package org.albertyu.model.config;
 
 import lombok.Data;
 import org.albertyu.application.App;
+import org.albertyu.model.Category;
+import org.albertyu.source.Source;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,14 +22,16 @@ public class Config {
     String username;
     String password;
     String loginPath;
-    Map<String, String> cookies;
+    Map<String, String> cookies = new HashMap<>();
 
     String apiPath;
     String savePath;
     String fileUploadPath;
 
-    Map<String, String> headers; // Headers for API access
+    Map<String, String> headers = new HashMap<>(); // Headers for API access
 
+    Map<Category, Integer> categories = new HashMap<>();
+    Source[] sources;
     String[] recipients;
     private int maxPastMinutes = 180;
 }
