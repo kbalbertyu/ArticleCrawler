@@ -37,7 +37,7 @@ public abstract class AbstractHandler {
         this.uploadArticle(article, driver, config);
     }
 
-    void deleteDownloadedImages(List<SavedImage> savedImages) {
+    private void deleteDownloadedImages(List<SavedImage> savedImages) {
         if (CollectionUtils.isEmpty(savedImages)) {
             return;
         }
@@ -46,7 +46,7 @@ public abstract class AbstractHandler {
         }
     }
 
-    void replaceImages(Article article, List<SavedImage> savedImages, Config config) {
+    private void replaceImages(Article article, List<SavedImage> savedImages, Config config) {
         if (CollectionUtils.isEmpty(savedImages)) {
             return;
         }
@@ -71,7 +71,7 @@ public abstract class AbstractHandler {
         article.setImageIds(imageIds);
     }
 
-    void cleanThirdPartyImages(Article article, Config config) {
+    private void cleanThirdPartyImages(Article article, Config config) {
         if (!article.hasImages()) {
             return;
         }
@@ -97,4 +97,6 @@ public abstract class AbstractHandler {
     abstract ImageUploadResult uploadImages(Article article, WebDriver driver, Config config);
 
     abstract void uploadArticle(Article article, WebDriver driver, Config config);
+
+    public abstract void access(WebDriver driver, Config config);
 }

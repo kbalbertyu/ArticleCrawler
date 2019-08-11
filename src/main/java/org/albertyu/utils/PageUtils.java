@@ -14,6 +14,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Set;
+
 /**
  * @author <a href="mailto:kbalbertyu@gmail.com">Albert Yu</a> 2019/8/4 19:53
  */
@@ -47,6 +49,13 @@ public class PageUtils {
         WaitTime(int value) {
             this.value = value;
         }
+    }
+
+    public static void addCookies(WebDriver driver, Set<Cookie> cookies) {
+        if (cookies == null || cookies.size() == 0) {
+            return;
+        }
+        cookies.forEach(cookie -> driver.manage().addCookie(cookie));
     }
 
     public static Document openArticlePage(WebDriver driver, Article article, boolean withoutDriver) {
@@ -143,6 +152,27 @@ public class PageUtils {
             return (new WebDriverWait(driver, waitTime.val())).until(ExpectedConditions.presenceOfElementLocated(by)) != null;
         } catch (WebDriverException e) {
             return false;
+        }
+    }
+
+    public static void setValue(WebDriver driver, By by, String value) {
+        try {
+            WebElement element = driver.findElement(by);
+            element.clear();
+            element.sendKeys(value);
+        } catch (NoSuchElementException e) {
+            LOGGER.error("Unable to find element with '{}': ", by.toString(), e);
+            throw new BusinessException(e);
+        }
+    }
+
+    public static void submit(WebDriver driver, By by) {
+        try {
+            WebElement element = driver.findElement(by);
+            element.submit();
+        } catch (NoSuchElementException e) {
+            LOGGER.error("Unable to find element with '{}': ", by.toString(), e);
+            throw new BusinessException(e);
         }
     }
 }

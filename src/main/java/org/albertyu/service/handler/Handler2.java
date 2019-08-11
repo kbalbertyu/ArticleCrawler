@@ -30,4 +30,9 @@ public class Handler2 extends AbstractHandler {
     void uploadArticle(Article article, WebDriver driver, Config config) {
 
     }
+
+    @Override
+    public void access(WebDriver driver, Config config) {
+
+    }
 }

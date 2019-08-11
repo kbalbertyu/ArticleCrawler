@@ -18,5 +18,6 @@ public class Constant {
     public static final String QUESTION_MARK = "?";
     public static final int MAX_REPEAT_TIMES = 3;
     public static final String DOWNLOAD_PATH = "downloads";
+    public static final String TMP_PATH = "tmp";
     public static final int DEFAULT_REQUEST_TIME_OUT = 6000;
 }

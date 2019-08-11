@@ -27,6 +27,10 @@ public class CrawlExecutor {
         WebDriver driver = null;
         try {
             driver = webDriverLauncher.start();
+            if (config.canLogin()) {
+                config.getHandler().access(driver, config);
+            }
+
             for (Source source : config.getSources()) {
                 List<Article> articles = source.fetchList(driver, config);
 

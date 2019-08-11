@@ -84,7 +84,7 @@ public class Tools {
         }
     }
 
-    private static String readFileToString(File file) {
+    public static String readFileToString(File file) {
         try {
             return FileUtils.readFileToString(file, Constant.UTF8);
         } catch (IOException e) {

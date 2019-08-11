@@ -1,10 +1,13 @@
 package org.albertyu.service.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.google.inject.Inject;
 import org.albertyu.model.*;
 import org.albertyu.utils.DownloadUtils;
 import org.albertyu.utils.Exceptions.BusinessException;
+import org.albertyu.utils.PageUtils;
 import org.albertyu.utils.PageUtils.WaitTime;
 import org.albertyu.utils.RegexUtils;
 import org.albertyu.utils.Tools;
@@ -12,6 +15,8 @@ import org.apache.commons.io.FileUtils;
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
 import org.jsoup.Jsoup;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +24,12 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Access to server from website admin portal with admin cookies
@@ -29,6 +38,7 @@ import java.util.Map;
 public class Handler1 extends AbstractHandler {
     private static final Logger logger = LoggerFactory.getLogger(Handler1.class);
     @Inject Messengers messengers;
+    private Map<String, String> cookies = new HashMap<>();
 
     /**
      * Download the images from article source,
@@ -93,7 +103,7 @@ public class Handler1 extends AbstractHandler {
 
     @Override
     void uploadArticle(Article article, WebDriver driver, Config config) {
-        Connection conn = this.createWebConnection(config.getSavePath(), adminCookie)
+        Connection conn = this.createWebConnection(config.getSavePath(), cookies)
             .data("title", article.getTitle())
             .data("summary", article.getSummary())
             .data("content", article.getContent())
@@ -142,7 +152,7 @@ public class Handler1 extends AbstractHandler {
      * Save uploaded images to DB, and move out of the temp directory
      */
     List<SavedImage> saveImages(Article article, ImageUploadResult result, Config config) {
-        Connection conn = this.createWebConnection(config.getFileUploadPath(), adminCookie);
+        Connection conn = this.createWebConnection(config.getFileUploadPath(), cookies);
 
         int i = 0;
         for (UploadedImage imageFile : result.getFiles()) {
@@ -189,5 +199,81 @@ public class Handler1 extends AbstractHandler {
             conn.cookies(cookies);
         }
         return conn;
+    }
+
+    @Override
+    public void access(WebDriver driver, Config config) {
+        if (!config.canLogin()) {
+            return;
+        }
+        this.fetchAdminCookies(driver, config);
+    }
+
+    private void fetchAdminCookies(WebDriver driver, Config config) {
+        driver.get(config.getLoginPath());
+        File cookieFile = this.getCookieFile(config);
+        By usernameBy = By.id("username");
+
+        // If login already, save the cookies
+        if (!PageUtils.present(driver, usernameBy, WaitTime.Normal)) {
+            this.saveCookies(driver, cookieFile);
+            return;
+        }
+
+        // If not login yet, try loading cookies from file
+        if (cookieFile.exists()) {
+            Set<Cookie> cookies = this.getCookies(cookieFile);
+            PageUtils.addCookies(driver, cookies);
+            driver.get(config.getLoginPath());
+        }
+
+        // If login already after loading cookies from file
+        if (!PageUtils.present(driver, usernameBy, WaitTime.Normal)) {
+            this.saveCookies(driver, cookieFile);
+            return;
+        }
+
+        // If not login yet after trying above process, perform logging in
+        driver.manage().deleteAllCookies();
+        PageUtils.setValue(driver, usernameBy, config.getUsername());
+        PageUtils.setValue(driver, By.id("password"), config.getPassword());
+        PageUtils.submit(driver, By.id("submit"));
+        WaitTime.Normal.execute();
+        if (!PageUtils.present(driver, usernameBy, WaitTime.Normal)) {
+            this.saveCookies(driver, cookieFile);
+            return;
+        }
+
+        throw new BusinessException(String.format("Unable to fetch admin cookies from: %s", config.getLoginPath()));
+    }
+
+    private Set<Cookie> getCookies(File cookieFile) {
+        return JSON.parseObject(Tools.readFileToString(cookieFile), new TypeReference<Set<Cookie>>() {
+                });
+    }
+
+    private void saveCookies(WebDriver driver, File file) {
+        Set<Cookie> cookies = driver.manage().getCookies();
+
+        for (Cookie cookie : cookies) {
+            this.cookies.put(cookie.getName(), cookie.getValue());
+        }
+        try {
+            FileUtils.writeStringToFile(file, JSON.toJSONString(cookies), Constant.UTF8);
+        } catch (IOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    private File getCookieFile(Config config) {
+        try {
+            URL url = new URL(config.getLoginPath());
+            String cookieFileName = String.format("cookies/%s.json", url.getHost());
+            return new File(Constant.TMP_PATH, cookieFileName);
+        } catch (MalformedURLException e) {
+            String message = String.format("Unable to extract host from url: %s", config.getLoginPath());
+            logger.error(message, e);
+            throw new BusinessException(message);
+        }
     }
 }

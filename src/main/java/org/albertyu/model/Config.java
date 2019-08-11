@@ -4,6 +4,7 @@ import lombok.Data;
 import org.albertyu.service.handler.AbstractHandler;
 import org.albertyu.source.Source;
 import org.albertyu.utils.Tools;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +14,7 @@ import java.util.Map;
  */
 @Data
 public class Config {
-    AbstractHandler handler;
+    public AbstractHandler handler;
     String baseUrl;
     String cdnUrl;
 
@@ -38,5 +39,11 @@ public class Config {
 
     public String fullUrl(String url) {
         return Tools.getAbsoluteUrl(url, baseUrl);
+    }
+
+    public boolean canLogin() {
+        return StringUtils.isNotBlank(loginPath)
+            && StringUtils.isNotBlank(password)
+            && StringUtils.isNotBlank(username);
     }
 }
