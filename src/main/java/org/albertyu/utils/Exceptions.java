@@ -16,4 +16,16 @@ public class Exceptions {
             super(cause);
         }
     }
+
+    public static class PastDateException extends RuntimeException {
+        private static final long serialVersionUID = 2346784065240518738L;
+
+        public PastDateException() {
+            super();
+        }
+
+        public PastDateException(String errorMsg) {
+            super(errorMsg);
+        }
+    }
 }

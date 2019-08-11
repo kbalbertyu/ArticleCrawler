@@ -1,7 +1,8 @@
 package org.albertyu.ui;
 
-import org.albertyu.application.App;
-import org.albertyu.model.config.Config;
+import org.albertyu.model.Config;
+import org.albertyu.service.CrawlExecutor;
+import org.albertyu.service.InstanceCaller;
 import org.albertyu.utils.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +18,8 @@ public class ArticleCrawler {
 
         Config config = Tools.loadAppConfig();
         try {
-            App app = config.getApp();
-            LOGGER.info("Running application: {}", app.name());
-            app.executor.execute(config);
+            LOGGER.info("Running application");
+            InstanceCaller.getBean(CrawlExecutor.class).execute(config);
         } catch (Exception e) {
             LOGGER.error("Unknown error found: ", e);
         } finally {

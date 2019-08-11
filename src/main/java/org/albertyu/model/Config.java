@@ -1,9 +1,9 @@
-package org.albertyu.model.config;
+package org.albertyu.model;
 
 import lombok.Data;
-import org.albertyu.application.App;
-import org.albertyu.model.Category;
+import org.albertyu.service.handler.AbstractHandler;
 import org.albertyu.source.Source;
+import org.albertyu.utils.Tools;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,8 +13,9 @@ import java.util.Map;
  */
 @Data
 public class Config {
-    App app;
+    AbstractHandler handler;
     String baseUrl;
+    String cdnUrl;
 
     /**
      * Admin login information
@@ -34,4 +35,8 @@ public class Config {
     Source[] sources;
     String[] recipients;
     private int maxPastMinutes = 180;
+
+    public String fullUrl(String url) {
+        return Tools.getAbsoluteUrl(url, baseUrl);
+    }
 }

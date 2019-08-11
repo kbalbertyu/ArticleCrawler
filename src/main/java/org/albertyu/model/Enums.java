@@ -1,5 +1,10 @@
 package org.albertyu.model;
 
+import org.albertyu.service.InstanceCaller;
+import org.albertyu.service.handler.AbstractHandler;
+import org.albertyu.service.handler.Handler1;
+import org.albertyu.service.handler.Handler2;
+
 import java.io.File;
 
 /**
@@ -7,7 +12,7 @@ import java.io.File;
  */
 public class Enums {
 
-    public enum ChromeDriverVersion {
+    public enum ChromeVersion {
         V740("74.0", 74, 74),
         V730("73.0", 73, 73),
         V720("72.0", 72, 72);
@@ -21,7 +26,7 @@ public class Enums {
             return WEB_DRIVER_HOME + File.separator + "chromedriver" + version + ".exe";
         }
 
-        ChromeDriverVersion(String version, int minChromeVersion, int maxChromeVersion) {
+        ChromeVersion(String version, int minChromeVersion, int maxChromeVersion) {
             this.version = version;
             this.minChromeVersion = minChromeVersion;
             this.maxChromeVersion = maxChromeVersion;
@@ -33,6 +38,17 @@ public class Enums {
         @Override
         public String toString() {
             return String.format("Chrome driver: %s, for version %s ~ %s", this.version, this.minChromeVersion, this.maxChromeVersion);
+        }
+    }
+
+    public enum ArticleHandler {
+        Handler1(InstanceCaller.getBean(Handler1.class)),
+        Handler2(InstanceCaller.getBean(Handler2.class));
+
+        public final AbstractHandler handler;
+
+        ArticleHandler(AbstractHandler handler) {
+            this.handler = handler;
         }
     }
 }
